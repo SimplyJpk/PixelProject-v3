@@ -13,8 +13,8 @@ class WorldChunk final : public ISerialize
 	WorldChunk* neighbour_chunks[Chunk::NUM_DIRECTIONS] = { nullptr };
 	time_t last_update_time = 0;
 
-	Uint32 pixel_data[Chunk::TOTAL_SIZE] = { 0 };
-	// TODO : (James) This may be pushing it, maybe keep this somewhere else
+	// Passed to the GPU for rendering, you almost never need to access this directly
+	uint64_t pixel_data[Chunk::TOTAL_SIZE] = { 0 };
 	uint8_t last_updated[Chunk::TOTAL_SIZE] = { 0 };
 
 	explicit WorldChunk(const IVec2& position);

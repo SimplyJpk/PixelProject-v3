@@ -47,7 +47,7 @@ WorldSimulator::WorldSimulator(Shader* draw_shader, const std::shared_ptr<GameSe
 	}
 
 	// Initialize map texture
-	_map_texture = new Texture(Chunk::SIZE_X, Chunk::SIZE_Y, TextureFormat::RED_LARGE);
+	_map_texture = new Texture(Chunk::SIZE_X, Chunk::SIZE_Y, TextureFormat::RG_LARGE);
 
 	// Set chunk data
 	for (int x = 0; x < WORLD_SIZE.x; x++) {

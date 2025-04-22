@@ -30,7 +30,7 @@ class WaterPixel : public BasePixel
 		update_function = static_cast<UpdateFunction>(&WaterPixel::PixelUpdate);
 	}
 
-	void PixelUpdate(PixelUpdateResult& data, Uint32& pixel_value)
+	void PixelUpdate(PixelUpdateResult& data, Uint64& pixel_value)
 	{
 		switch (data.Dir()) {
 		case WorldDir::East:

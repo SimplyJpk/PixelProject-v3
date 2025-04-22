@@ -70,11 +70,11 @@ void BasePixel::GetIndexAs4FColour(const short index, float* out_colour) const
 	}
 }
 
-Uint32 BasePixel::GetNewPixel()
+Uint64 BasePixel::GetNewPixel()
 {
 	if (new_pixel_count > 0) {
 		return new_pixel_value[distribution(rand_engine)];
 	}
-	return static_cast<Uint32>(pixel_index);
+	return static_cast<Uint64>(pixel_index);
 }
 

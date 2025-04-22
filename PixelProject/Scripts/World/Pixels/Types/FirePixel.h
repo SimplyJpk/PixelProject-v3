@@ -40,7 +40,7 @@ class FirePixel final : public BasePixel
 		update_function = static_cast<UpdateFunction>(&FirePixel::PixelUpdate);
 	}
 
-	void PixelUpdate(PixelUpdateResult& data, Uint32& pixel_value)
+	void PixelUpdate(PixelUpdateResult& data, Uint64& pixel_value)
 	{
 		// auto lifetime = PixelMask::Lifetime::GetValue(pixel_value);
 		// lifetime -= 1;

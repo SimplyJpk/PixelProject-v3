@@ -33,8 +33,8 @@ class BasePixel
 
 	// TODO : (James) Can this be wrapped into something more flexible?
 	uint8_t new_pixel_count = 0;
-	Uint32 new_pixel_value[Pixel::MAX_NEW_VALUE_COUNT] = { 0 };
-	Uint32 GetNewPixel();
+	Uint64 new_pixel_value[Pixel::MAX_NEW_VALUE_COUNT] = { 0 };
+	Uint64 GetNewPixel();
 
 	const std::array<uint8_t, 8>& GetPixelUpdateOrder();
 	Uint32 GetRandomColour();
@@ -43,9 +43,10 @@ class BasePixel
 	void GetIndexAs4FColour(short index, float* out_colour) const;
 
 	// Pixel Updating
-	typedef void (BasePixel::*UpdateFunction)(PixelUpdateResult&, Uint32& pixel_value);
+	typedef void (BasePixel::*UpdateFunction)(PixelUpdateResult&, Uint64& pixel_value);
 	UpdateFunction update_function = nullptr;
-	void UpdatePixel(PixelUpdateResult& result, Uint32& pixel_value)
+	
+	void UpdatePixel(PixelUpdateResult& result, Uint64& pixel_value)
 	{
 		if (update_function) {
 			(this->*update_function)(result, pixel_value);

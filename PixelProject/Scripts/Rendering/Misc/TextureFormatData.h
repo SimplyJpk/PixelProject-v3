@@ -8,6 +8,7 @@ enum class TextureFormat : unsigned int
 	// Dsd
 	RED_LARGE,
 	RG,
+	RG_LARGE,
 	RGB,
 	RGBA,
 	TYPE_COUNT
@@ -34,6 +35,7 @@ namespace TextureData
 	SHORT_TYPE RED_SMALL[SHORT_V] = { GL_TEXTURE_2D, GL_RED, GL_RED, GL_UNSIGNED_BYTE };
 	SHORT_TYPE RED_LARGE[SHORT_V] = { GL_TEXTURE_2D, GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT };
 	SHORT_TYPE RG[SHORT_V] = { GL_TEXTURE_2D, GL_RG, GL_RG, GL_UNSIGNED_INT_8_8_8_8 };
+	SHORT_TYPE RG_LARGE[SHORT_V] = { GL_TEXTURE_2D, GL_RG32UI, GL_RG_INTEGER, GL_UNSIGNED_INT };
 	SHORT_TYPE RGB[SHORT_V] = { GL_TEXTURE_2D, GL_RGB, GL_RGB, GL_UNSIGNED_INT_8_8_8_8 };
 	SHORT_TYPE RGBA[SHORT_V] = { GL_TEXTURE_2D, GL_RGBA, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8 };
 
@@ -47,6 +49,7 @@ constexpr static const GLuint* FORMAT_DATA_TYPES[static_cast<int>(TextureFormat:
 		TextureData::RED_SMALL,
 		TextureData::RED_LARGE,
 		TextureData::RG,
+		TextureData::RG_LARGE,
 		TextureData::RGB,
 		TextureData::RGBA
 	};
