@@ -1,10 +1,23 @@
-cmake_minimum_required(VERSION 3.28)
+set_property(DIRECTORY PROPERTY KEEP_EXTENSION_TARGETS_IN_NORMAL_TARGETS TRUE)
+
+cmake_minimum_required(VERSION 3.5)
 project(PixelProject)
+
+# Enable cmake caching for faster builds
+set(CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY ON)
+set(CMAKE_FIND_USE_PACKAGE_REGISTRY OFF)
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Bin Folder
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# Exclude Some Windows Stuff
+if (WIN32)
+    add_compile_definitions(NOMINMAX)
+endif()
 
 # CPM
 file(
@@ -54,7 +67,7 @@ CPMAddPackage(
         NAME implot
         GITHUB_REPOSITORY epezent/implot
         GIT_TAG master
-        DOWNLOAD_ONLY YES
+        DOWNLOAD_ONLY
 )
 
 if (implot_ADDED)
@@ -88,8 +101,11 @@ CPMAddPackage("gh:libsdl-org/SDL_ttf#a1ce367")
 list(APPEND LIBS SDL3_ttf::SDL3_ttf)
 
 # Boost
-find_package(Boost REQUIRED)
-list(APPEND LIBS Boost::boost)
+find_package(Boost 1.87.0 REQUIRED COMPONENTS thread system)
+
+if(Boost_FOUND)
+    list(APPEND LIBS Boost::thread Boost::system)
+endif()
 
 # cereal
 CPMAddPackage("gh:uscilab/cereal#ebef1e9")
@@ -101,8 +117,14 @@ list(APPEND LIBS cereal)
 
 # Add GLEW package - modify this section
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-list(APPEND LIBS GLEW::GLEW)
+CPMAddPackage(
+    NAME GLEW
+    GITHUB_REPOSITORY "Perlmint/glew-cmake"
+    GIT_TAG "glew-cmake-2.2.0"
+)
+if(GLEW_ADDED)
+    list(APPEND LIBS libglew_static)
+endif()
 
 # GLM
 CPMAddPackage("gh:g-truc/glm#0af55cc")
@@ -147,7 +169,9 @@ target_sources(${PROJECT_NAME} PRIVATE ${SOURCES} ${HEADERS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS} ${OPENGL_LIBRARIES})
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+    ${LIBS}
+)
 
 # Includes
 target_include_directories(${PROJECT_NAME} PRIVATE 
@@ -157,6 +181,23 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/glm
 )
 
+if (Boost_FOUND)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
+endif()
+
 # Definitions
 target_compile_definitions(${PROJECT_NAME} PRIVATE WIN32_LEAN_AND_MEAN)
 target_compile_definitions(${PROJECT_NAME} PRIVATE PIXEL_PROJECT_DEBUG)
+
+# After Building, copy shaders and textures folders into the bin folder
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/PixelProject/shaders
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
+)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/PixelProject/textures
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/textures
+)

@@ -100,6 +100,13 @@ bool CreateWindowAndContext()
       {
          Console::PrintSuccess("OpenGL context created successfully!\n");
       }
+
+      if (glewIsSupported("GL_ARB_gpu_shader_int64")) {
+         Console::PrintSuccess("GL_ARB_gpu_shader_int64 is supported!\n");
+      } else {
+         Console::PrintWarning("GL_ARB_gpu_shader_int64 is not supported by your GPU, rip.\n");
+      }
+
       SDL_GL_MakeCurrent(g_window, g_context);
       if (SDL_GL_SetSwapInterval(1) == false)
       {
