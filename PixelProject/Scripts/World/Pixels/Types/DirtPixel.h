@@ -5,9 +5,8 @@
 class DirtPixel final : public BasePixel
 {
  public:
-	DirtPixel()
+	DirtPixel() : BasePixel(Pixel::PixelType::Dirt)
 	{
-		pixel_type = Pixel::PixelType::Dirt;
 		SET_PIXEL_NAME("Dirt");
 		is_updateable = false;
 

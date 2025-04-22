@@ -9,9 +9,8 @@ using namespace Pixel;
 class SandPixel final : public BasePixel
 {
  public:
-	SandPixel()
+	SandPixel() : BasePixel(Pixel::PixelType::Sand)
 	{
-		pixel_type = Pixel::PixelType::Sand;
 		SET_PIXEL_NAME("Sand");
 		is_updateable = true;
 

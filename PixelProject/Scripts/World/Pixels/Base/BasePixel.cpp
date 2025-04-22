@@ -3,13 +3,17 @@
 
 using namespace Chunk;
 
-BasePixel::BasePixel()
+BasePixel::BasePixel(Pixel::PixelType _pixel_type)
 {
 	// Flood all update orders with Undefined directions
 	SET_PIXEL_UPDATE_ORDER(0, WorldDir::Undefined);
 	SET_PIXEL_UPDATE_ORDER(1, WorldDir::Undefined);
 	SET_PIXEL_UPDATE_ORDER(2, WorldDir::Undefined);
 	SET_PIXEL_UPDATE_ORDER(3, WorldDir::Undefined);
+
+	// Construct some default values based on our PixelType to avoid additional processing outside of the derived classes
+	this->pixel_index = static_cast<uint8_t>(_pixel_type);
+	this->pixel_type = _pixel_type;
 }
 
 const std::array<uint8_t, 8>& BasePixel::GetPixelUpdateOrder()

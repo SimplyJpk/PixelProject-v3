@@ -7,9 +7,8 @@ using namespace Chunk;
 class WaterPixel : public BasePixel
 {
  public:
-	WaterPixel()
+	WaterPixel() : BasePixel(Pixel::PixelType::Water)
 	{
-		pixel_type = Pixel::PixelType::Water;
 		SET_PIXEL_NAME("Water");
 		is_updateable = true;
 

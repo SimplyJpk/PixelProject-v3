@@ -8,9 +8,8 @@ using namespace Pixel;
 class WoodPixel final : public BasePixel
 {
  public:
-	WoodPixel()
+	WoodPixel() : BasePixel(Pixel::PixelType::Wood)
 	{
-		pixel_type = PixelType::Wood;
 		SET_PIXEL_NAME("Wood");
 		is_updateable = true;
 

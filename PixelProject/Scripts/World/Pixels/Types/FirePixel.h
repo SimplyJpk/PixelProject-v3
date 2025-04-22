@@ -9,9 +9,8 @@ using namespace Pixel;
 class FirePixel final : public BasePixel
 {
  public:
-	FirePixel()
+	FirePixel() : BasePixel(Pixel::PixelType::Fire)
 	{
-		pixel_type = Pixel::PixelType::Fire;
 		SET_PIXEL_NAME("Fire");
 		is_updateable = true;
 
@@ -27,24 +26,39 @@ class FirePixel final : public BasePixel
 			WorldDir::NorthEast,
 			WorldDir::NorthWest,
 			WorldDir::SouthWest,
-			WorldDir::SouthEast);
+			WorldDir::SouthEast
+		);
 		SET_PIXEL_UPDATE_ORDER(1,
 			WorldDir::North,
 			WorldDir::NorthWest,
 			WorldDir::NorthEast,
 			WorldDir::SouthEast,
-			WorldDir::SouthWest);
+			WorldDir::SouthWest
+		);
 
 		distribution = std::uniform_int_distribution<int>(0, colour_count - 1);
 
 		update_function = static_cast<UpdateFunction>(&FirePixel::PixelUpdate);
+
+		constexpr Uint8 FIRE_LIFETIMES[] = { 10, 14, 20, 12};
+		new_pixel_value[0] = PixelMask::Lifetime::SetValue(pixel_index, FIRE_LIFETIMES[0]);
+		new_pixel_value[1] = PixelMask::Lifetime::SetValue(pixel_index, FIRE_LIFETIMES[1]);
+		new_pixel_value[2] = PixelMask::Lifetime::SetValue(pixel_index, FIRE_LIFETIMES[2]);	
+		new_pixel_value[3] = PixelMask::Lifetime::SetValue(pixel_index, FIRE_LIFETIMES[3]);
+
+		new_pixel_count = 4;
 	}
 
 	void PixelUpdate(PixelUpdateResult& data, Uint64& pixel_value)
 	{
-		// auto lifetime = PixelMask::Lifetime::GetValue(pixel_value);
-		// lifetime -= 1;
+		pixel_value = PixelMask::Lifetime::DecrementValue(pixel_value);
 
+		Uint8 lifetime = PixelMask::Lifetime::GetValue(pixel_value);
+		// > 80% of the time, probably not going to be 0, so we can assume it is unlikely
+		if (lifetime == 0) [[unlikely]] {
+			data.SetLocal(PixelType::Space);
+			return;
+		}
 
 		switch (data.Dir()) {
 		case WorldDir::North:

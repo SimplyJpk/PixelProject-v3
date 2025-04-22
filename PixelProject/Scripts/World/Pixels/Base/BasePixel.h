@@ -13,7 +13,7 @@
 class BasePixel
 {
  public:
-	BasePixel();
+	BasePixel(Pixel::PixelType _pixel_type = Pixel::PixelType::UNDEF);
 
  public:
 	Pixel::PixelType pixel_type = Pixel::PixelType::UNDEF;

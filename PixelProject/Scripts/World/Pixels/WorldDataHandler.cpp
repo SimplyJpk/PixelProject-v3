@@ -26,7 +26,7 @@ WorldDataHandler::WorldDataHandler()
 
 	int index = 0;
 	for (auto& pixel : _pixel_types) {
-		pixel.pixel_index = index++;
+		// pixel.pixel_index = index++; // Handled by constructor of BasePixel now
 		for (auto i = 0; i < pixel.colour_count; ++i) {
 			if (_pixel_colour_map.contains(pixel.type_colours[i]))
 				DEBUG_WARNING_LOG("[WorldDataHandler] Duplicate pixel colour {} found for pixel type {}.",
