@@ -83,13 +83,13 @@ void WorldDataHandler::SetUniformData(Shader* shader)
 
 	// Set MaskData
 	loc = shader->GetUniformLocation("u_PixelMask.index");
-	glProgramUniform1ui(programID, loc, PixelMask::Index::BITS);
+	glProgramUniform1ui(programID, loc, PixelMask::Index::GPU_SHADER_BITS);
 	loc = shader->GetUniformLocation("u_PixelMask.lifetime");
-	glProgramUniform1ui(programID, loc, PixelMask::Lifetime::BITS);
+	glProgramUniform1ui(programID, loc, PixelMask::Lifetime::GPU_SHADER_BITS);
 	loc = shader->GetUniformLocation("u_PixelMask.behaviour");
-	glProgramUniform1ui(programID, loc, PixelMask::Behaviour::BITS);
+	glProgramUniform1ui(programID, loc, PixelMask::Behaviour::GPU_SHADER_BITS);
 	loc = shader->GetUniformLocation("u_PixelMask.light");
-	glProgramUniform1ui(programID, loc, PixelMask::Light::BITS);
+	glProgramUniform1ui(programID, loc, PixelMask::Light::GPU_SHADER_BITS);
 
 	// Set MaskData
 	loc = shader->GetUniformLocation("u_PixelBitOffset.index");

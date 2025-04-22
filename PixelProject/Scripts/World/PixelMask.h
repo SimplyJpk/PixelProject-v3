@@ -3,87 +3,171 @@
 
 namespace PixelMask
 {
-	struct Index
+	
+	template <Uint64 BitMask, Uint8 Count, Uint8 Depth, typename ValueType = Uint8>
+	struct Mask
 	{
-		inline constexpr static Uint32 BITS = 0b0000'0000'0000'0000'0000'0000'0001'1111;
-		inline constexpr static Uint8 COUNT = 5;
-		inline constexpr static Uint8 DEPTH = 0 + 1;
 
-		constexpr static Uint32 GetMask()
+		static constexpr Uint64 BITS = BitMask;
+		
+		static constexpr Uint8 COUNT = Count;
+		static constexpr Uint8 DEPTH = Depth;
+
+		// To try increase support by not needing 64bit values in shader, we pass in low/high bits separately due to uint64 limitations
+		static constexpr Uint32 GPU_SHADER_BITS = (BITS > 0xFFFFFFFF) ? ((BITS >> 32) & 0xFFFFFFFF) : (BITS & 0xFFFFFFFF);
+		static constexpr ValueType MAX_VALUE = (1ULL << COUNT) - 1;
+
+		#pragma region Getter Methods
+
+		static constexpr Uint64 GetBitMask() { return BITS; } // TODO: (James) Maybe remove? We can just use BITS directly, maybe rename BITS to MASK or something?
+		/**
+		 * @brief Get the Max Value object for the related mask bits. ie; if COUNT is 3, the max value is 7 regardless of where those bits are located.
+		 * ie; 0b0000'0111'0000 and 0b0000'0000'0111 would both return 7 as the max value.
+		 * 
+		 * @return constexpr ValueType The max value of the mask bits.
+		 */
+		static constexpr ValueType GetMaxValue() { return MAX_VALUE; }
+
+		static constexpr ValueType GetValue(Uint64 pixelData)
 		{
-			return BITS << DEPTH;
+			return static_cast<ValueType>((pixelData & BITS) >> DEPTH);
 		}
-		constexpr static Uint32 GetMaxValue()
+
+		#pragma endregion
+
+		#pragma region Setter Methods
+
+		static constexpr Uint64 SetValue(Uint64 pixelData, ValueType new_value)
 		{
-			return (1 << COUNT) - 1;
+			return (pixelData & ~BITS) | ((static_cast<Uint64>(new_value) & GetMaxValue()) << DEPTH);
 		}
-		constexpr static uint8_t GetValue(const Uint32 value)
+
+		#pragma endregion
+ 
+		#pragma region Decrement Methods
+
+		/**
+		 * @brief Decrements the value relevant to the masks bits by 1 if it is greater than 0, otherwise returns the value unchanged.
+		 * This method uses the [[likely]] attribute to hint the compiler that the value is greater than 0.
+		 * Consider the use of DecrementValueFast for more "performance" at the cost of underflow checks.
+		 * 
+		 * @param pixelData The pixel data to decrement the value from.
+		 * @return constexpr Uint64 The decremented value.
+		 */
+		static constexpr Uint64 DecrementValue(Uint64 pixelData)
 		{
-			const Uint32 maskedValue = (value & BITS) << 1;
-			return static_cast<Uint8>((maskedValue & GetMask()) >> DEPTH);
+			ValueType current = GetValue(pixelData);
+			if (current > 0) [[likely]] {
+				return SetValue(pixelData, current - 1);
+			}
+			return pixelData;
 		}
+
+		/**
+		 * @brief Decrements the value relevant to the masks bits by 1 without checking if it is greater than 0.
+		 * This method is "faster" than DecrementValue but may cause underflow if the value is already 0.
+		 * 
+		 * @param pixelData The pixel data to decrement the value from.
+		 * @return constexpr Uint64 The decremented value.
+		 */
+		static constexpr Uint64 DecrementValueFast(Uint64 pixelData)
+		{
+			ValueType current = GetValue(pixelData);
+			return SetValue(pixelData, current - 1);
+		}
+
+		/**
+		 * @brief Decrements the value relevant to the masks bits by 1 if it is greater than 0, otherwise returns the value unchanged.
+		 * This method is branchless and thus may be faster in some cases, but depends on additional instructions so may be slower unless it is likely to be 0.
+		 * 
+		 * @param pixelData The pixel data to decrement the value from.
+		 * @return constexpr Uint64 The decremented value.
+		 */
+		static constexpr Uint64 DecrementValueBranchless(Uint64 pixelData)
+		{
+			ValueType current = GetValue(pixelData);
+			// Decrement if > 0, otherwise keep current value
+			ValueType new_value = current - (current > 0);
+			return SetValue(pixelData, new_value);
+		}
+
+		#pragma endregion
+
+		#pragma region Increment Methods
+
+		/**
+		 * @brief Increments the value relevant to the masks bits by 1 if it is less than the maximum value, otherwise returns the value unchanged.
+		 * This method uses the [[likely]] attribute to hint the compiler that the value is less than the maximum value.
+		 * Consider the use of IncrementValueFast for more "performance" at the cost of overflow checks.
+		 * 
+		 * @param pixelData The pixel data to increment the value from.
+		 * @return constexpr Uint64 The incremented value.
+		 */
+		static constexpr Uint64 IncrementValue(Uint64 pixelData)
+		{
+			ValueType current = GetValue(pixelData);
+			if (current < MAX_VALUE) [[likely]] {
+				return SetValue(pixelData, current + 1);
+			}
+			return pixelData;
+		}
+
+		/**
+		 * @brief Increments the value relevant to the masks bits by 1 without checking if it is less than the maximum value.
+		 * This method is "faster" than IncrementValue but may cause overflow if the value is already the maximum value.
+		 * 
+		 * @param pixelData The pixel data to increment the value from.
+		 * @return constexpr Uint64 The incremented value.
+		 */
+		static constexpr Uint64 IncrementValueFast(Uint64 pixelData)
+		{
+			ValueType current = GetValue(pixelData);
+			return SetValue(pixelData, current + 1);
+		}
+
+		/**
+		 * @brief Increments the value relevant to the masks bits by 1 if it is less than the maximum value, otherwise returns the value unchanged.
+		 * This method is branchless and thus may be faster in some cases, but depends on additional instructions so may be slower unless it is likely to be less than the maximum value.
+		 * 
+		 * @param pixelData The pixel data to increment the value from.
+		 * @return constexpr Uint64 The incremented value.
+		 */
+		static constexpr Uint64 IncrementValueBranchless(Uint64 pixelData)
+		{
+			ValueType current = GetValue(pixelData);
+			// Increment if < MAX_VALUE, otherwise keep current value
+			ValueType new_value = current + (current < MAX_VALUE);
+			return SetValue(pixelData, new_value);
+		}
+
+		#pragma endregion
+
+		#pragma region Assertions
+
+		static_assert(std::is_integral_v<ValueType>, "ValueType must be an integral type");
+		// Assert MAX_VALUE <= std::numeric_limits<ValueType>::max() and print out seen and max value
+		static_assert(MAX_VALUE <= std::numeric_limits<ValueType>::max(), "ValueType cannot hold the maximum value of the mask");
+		// Check the mask matches a generated mask of the same count and depth
+		static_assert(BITS == ((1ULL << Count) - 1) << Depth, "BitMask does not match Count and Depth");
+		
+		#pragma endregion
 	};
 
-	struct Lifetime
-	{
-		inline constexpr static Uint32 BITS = 0b1111'1100'0000'0000'0000'0000'0000'0000;
-		inline constexpr static Uint8 COUNT = 6;
-		inline constexpr static Uint8 DEPTH = 26 + 1;
+	#pragma region Pixel Masks
 
-		constexpr static Uint32 GetMask()
-		{
-			return BITS << DEPTH;
-		}
-		constexpr static Uint32 GetMaxValue()
-		{
-			return (1 << COUNT) - 1;
-		}
-		constexpr static uint8_t GetValue(const Uint32 value)
-		{
-			return (value & GetMask()) >> DEPTH;
-		}
-	};
+	// Aliases for the Masks <- Most Significant Bit (MSB) is on the left, Least Significant Bit (LSB) is on the right ->
 
-	struct Behaviour
-	{
-		inline constexpr static Uint32 BITS = 0b0000'0011'1100'0000'0000'0000'0000'0000;
-		inline constexpr static uint8_t COUNT = 4;
-		inline constexpr static uint8_t DEPTH = 22 + 1;
+	// Component, used to determine when a pixel is destroyed. (6 bits, values 0-63). 
+	using Lifetime = 		Mask<0b1111'1100'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000, 6, 58, Uint8>;
+	// Component, can be unique between pixels and used to determine how a pixel interacts with other pixels or the world. (4 bits, values 0-15).
+	using Behaviour = 		Mask<0b0000'0011'1100'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000, 4, 54, Uint8>;
 
-		constexpr static Uint32 GetMask()
-		{
-			return BITS << DEPTH;
-		}
-		constexpr static Uint32 GetMaxValue()
-		{
-			return (1 << COUNT) - 1;
-		}
-		constexpr static uint8_t GetValue(const Uint32 value)
-		{
-			return (value & GetMask()) >> DEPTH;
-		}
-	};
+	// New Masks somewhere in here
 
-	struct Light
-	{
-		inline constexpr static Uint32 BITS = 0b0000'0000'0000'0000'0000'0000'1110'0000;
-		inline constexpr static uint8_t COUNT = 3;
-		inline constexpr static uint8_t DEPTH = 5 + 1;
+	// Component, used to determine the light level of a pixel. (3 bits, values 0-7).
+	using Light = 			Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1110'0000, 3, 5, Uint8>;
+	// Component, used to determine the index of a pixel. (5 bits, values 0-31).
+	using Index = 			Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0001'1111, 5, 0, Uint8>;
 
-		constexpr static Uint32 GetMask()
-		{
-			return BITS << DEPTH;
-		}
-		constexpr static Uint32 GetMaxValue()
-		{
-			return (1 << COUNT) - 1;
-		}
-		constexpr static uint8_t GetValue(const Uint32 value)
-		{
-			return (value & GetMask()) >> DEPTH;
-		}
-	};
-
-	// TODO : (James) Unused, but here as a reminder for future use
-	inline constexpr static Uint32 REMAINING_BITS = 0b0000'0000'0011'1111'1111'1111'0000'0000;
+	#pragma endregion
 }
