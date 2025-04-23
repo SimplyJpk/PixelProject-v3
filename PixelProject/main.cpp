@@ -73,7 +73,7 @@ bool CreateWindowAndContext()
    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
    constexpr auto windowFlags = static_cast<SDL_WindowFlags>(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
-   g_window = SDL_CreateWindow("Pixel Project v2", g_config.get()->window_size_x, g_config.get()->window_size_y, windowFlags);
+   g_window = SDL_CreateWindow("Pixel Project v3", g_config.get()->window_size_x, g_config.get()->window_size_y, windowFlags);
    if (g_window == nullptr)
    {
       Console::PrintError(std::string("Window could not be created!\nSDL Err: %s\n", SDL_GetError()));
