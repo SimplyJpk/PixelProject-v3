@@ -12,7 +12,14 @@
 
 class BasePixel
 {
- public:
+protected:
+	// No-Op function
+	void NoOpUpdate(PixelUpdateResult &, Uint64 &) noexcept {}
+
+public:
+    using UpdateFunction = void (BasePixel::*)(PixelUpdateResult &, Uint64 &);
+
+	// Constructor, taking in the pixel type to help with initialisation
 	BasePixel(Pixel::PixelType _pixel_type = Pixel::PixelType::UNDEF);
 
  public:
@@ -43,14 +50,10 @@ class BasePixel
 	void GetIndexAs4FColour(short index, float* out_colour) const;
 
 	// Pixel Updating
-	typedef void (BasePixel::*UpdateFunction)(PixelUpdateResult&, Uint64& pixel_value);
-	UpdateFunction update_function = nullptr;
-	
-	void UpdatePixel(PixelUpdateResult& result, Uint64& pixel_value)
+	UpdateFunction update_function = &BasePixel::NoOpUpdate;
+	void UpdatePixel(PixelUpdateResult &result, Uint64 &pixel_value)
 	{
-		if (update_function) {
-			(this->*update_function)(result, pixel_value);
-		}
+		(this->*update_function)(result, pixel_value);
 	}
 
  protected:
