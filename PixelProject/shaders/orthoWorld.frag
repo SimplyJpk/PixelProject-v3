@@ -5,7 +5,7 @@ layout (location = 1) out vec4 BrightColor;
 in vec2 TexCoord;
 
 uniform usampler2D ourTexture;
-uniform sampler2D noiseTextureIndex;
+uniform usampler2D noiseTextureIndex;
 
 struct PixelData {
     uint colour_count;
@@ -42,9 +42,8 @@ void main()
 
     vec4 colours[4] = u_Pixels[pixelType].colours;
 
-    float noiseValue = texture(noiseTextureIndex, TexCoord).r;
-    uint noiseIndex = uint(noiseValue * 3.0);
-
+    uint noiseIndex = texture(noiseTextureIndex, TexCoord).r;
+    
     uint index = noiseIndex % u_Pixels[pixelType].colour_count;
 
     FragColor = colours[index];
