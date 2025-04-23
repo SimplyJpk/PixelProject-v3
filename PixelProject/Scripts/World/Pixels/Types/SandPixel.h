@@ -24,8 +24,6 @@ class SandPixel final : public BasePixel
 		SET_PIXEL_UPDATE_ORDER(0, WorldDir::South, WorldDir::SouthEast, WorldDir::SouthWest);
 		SET_PIXEL_UPDATE_ORDER(1, WorldDir::South, WorldDir::SouthWest, WorldDir::SouthEast);
 
-		distribution = std::uniform_int_distribution<int>(0, colour_count - 1);
-
 		update_function = static_cast<UpdateFunction>(&SandPixel::PixelUpdate);
 	}
 

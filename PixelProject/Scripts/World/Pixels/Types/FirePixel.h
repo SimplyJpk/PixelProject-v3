@@ -36,8 +36,6 @@ class FirePixel final : public BasePixel
 			WorldDir::SouthWest
 		);
 
-		distribution = std::uniform_int_distribution<int>(0, colour_count - 1);
-
 		update_function = static_cast<UpdateFunction>(&FirePixel::PixelUpdate);
 
 		constexpr Uint8 FIRE_LIFETIMES[] = { 10, 14, 20, 12};

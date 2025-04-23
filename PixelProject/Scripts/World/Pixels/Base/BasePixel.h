@@ -28,10 +28,6 @@ public:
 
 	bool is_updateable = false;
 
-	// Random seeded with pixel_type
-	std::minstd_rand rand_engine;
-	std::uniform_int_distribution<int> distribution;
-
 	// Pixel Settings
 	uint8_t pixel_index = 0;
 	uint8_t colour_count = 0;

@@ -24,8 +24,6 @@ class WaterPixel : public BasePixel
 		SET_PIXEL_UPDATE_ORDER(2, WorldDir::South, WorldDir::SouthWest, WorldDir::SouthEast, WorldDir::West);
 		SET_PIXEL_UPDATE_ORDER(3, WorldDir::South, WorldDir::West, WorldDir::East, WorldDir::SouthWest);
 
-		distribution = std::uniform_int_distribution<int>(0, colour_count - 1);
-
 		update_function = static_cast<UpdateFunction>(&WaterPixel::PixelUpdate);
 	}
 

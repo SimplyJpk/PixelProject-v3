@@ -15,8 +15,6 @@ class SpacePixel final : public BasePixel
 		type_colours[0] = 0x00000000;
 
 		_pixel_update_order_count = 0;
-
-		distribution = std::uniform_int_distribution<int>(0, colour_count - 1);
 	}
 
 };

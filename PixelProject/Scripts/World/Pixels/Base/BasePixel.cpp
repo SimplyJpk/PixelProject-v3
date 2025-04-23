@@ -49,7 +49,7 @@ void BasePixel::SetPixelName(const char* const name)
 Uint32 BasePixel::GetRandomColour()
 {
 	// TODO : (James) Consider adding a "buffer" and iterating through that instead of RNG here which is kinda slow, and pointless for (2-4 values)
-	return type_colours[distribution(rand_engine)];
+	return type_colours[_rng() % colour_count];
 }
 
 void BasePixel::GetColourAs4F(const Uint32 colour, float* out_colour)
@@ -77,7 +77,7 @@ void BasePixel::GetIndexAs4FColour(const short index, float* out_colour) const
 Uint64 BasePixel::GetNewPixel()
 {
 	if (new_pixel_count > 0) {
-		return new_pixel_value[distribution(rand_engine)];
+		return new_pixel_value[_rng() % new_pixel_count];
 	}
 	return static_cast<Uint64>(pixel_index);
 }

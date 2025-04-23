@@ -21,9 +21,6 @@ class WoodPixel final : public BasePixel
 
 		_pixel_update_order_count = 0;
 
-		distribution = std::uniform_int_distribution<int>(0, colour_count - 1);
-
-		// update_function = static_cast<UpdateFunction>(&WoodPixel::PixelUpdate);
 	}
 
 };
