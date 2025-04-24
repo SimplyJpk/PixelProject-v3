@@ -3,10 +3,20 @@ set_property(DIRECTORY PROPERTY KEEP_EXTENSION_TARGETS_IN_NORMAL_TARGETS TRUE)
 cmake_minimum_required(VERSION 3.5)
 project(PixelProject)
 
-# Enable cmake caching for faster builds
-set(CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY ON)
-set(CMAKE_FIND_USE_PACKAGE_REGISTRY OFF)
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
+# Set default build type to Debug if not specified
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif()
+
+# Configure compiler flags for different build types
+if(MSVC)
+  # Visual Studio flags
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Ob2 /Oi /Ot /GL /Gy /MD /DNDEBUG")
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG")
+else()
+  # GCC/Clang flags
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -DNDEBUG")
+endif()
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
