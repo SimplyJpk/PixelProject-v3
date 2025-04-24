@@ -7,7 +7,7 @@ class SpacePixel final : public BasePixel
  public:
 	SpacePixel() : BasePixel(Pixel::PixelType::Space)
 	{
-		SET_PIXEL_NAME("Space");
+		SetPixelName("Space");
 		is_updateable = false;
 
 		colour_count = 1;

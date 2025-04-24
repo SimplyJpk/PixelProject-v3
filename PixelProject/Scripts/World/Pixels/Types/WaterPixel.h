@@ -6,10 +6,10 @@ using namespace Chunk;
 
 class WaterPixel : public BasePixel
 {
- public:
+public:
 	WaterPixel() : BasePixel(Pixel::PixelType::Water)
 	{
-		SET_PIXEL_NAME("Water");
+		SetPixelName("Water");
 		is_updateable = true;
 
 		colour_count = 3;
@@ -19,22 +19,25 @@ class WaterPixel : public BasePixel
 		type_colours[2] = 0x1818F3FF;
 
 		_pixel_update_order_count = 4;
-		SET_PIXEL_UPDATE_ORDER(0, WorldDir::South, WorldDir::SouthEast, WorldDir::SouthWest, WorldDir::East);
-		SET_PIXEL_UPDATE_ORDER(1, WorldDir::South, WorldDir::East, WorldDir::West, WorldDir::SouthEast);
-		SET_PIXEL_UPDATE_ORDER(2, WorldDir::South, WorldDir::SouthWest, WorldDir::SouthEast, WorldDir::West);
-		SET_PIXEL_UPDATE_ORDER(3, WorldDir::South, WorldDir::West, WorldDir::East, WorldDir::SouthWest);
+		SetPixelUpdateOrder(0, {WorldDir::South, WorldDir::SouthEast, WorldDir::SouthWest, WorldDir::East});
+		SetPixelUpdateOrder(1, {WorldDir::South, WorldDir::East, WorldDir::West, WorldDir::SouthEast});
+		SetPixelUpdateOrder(2, {WorldDir::South, WorldDir::SouthWest, WorldDir::SouthEast, WorldDir::West});
+		SetPixelUpdateOrder(3, {WorldDir::South, WorldDir::West, WorldDir::East, WorldDir::SouthWest});
 
 		update_function = static_cast<UpdateFunction>(&WaterPixel::PixelUpdate);
 	}
 
-	void PixelUpdate(PixelUpdateResult& data, Uint64& pixel_value)
+	void PixelUpdate(PixelUpdateResult &data, Uint64 &pixel_value)
 	{
-		switch (data.Dir()) {
+		switch (data.Dir())
+		{
 		case WorldDir::East:
 		case WorldDir::West:
 		case WorldDir::SouthEast:
-		case WorldDir::SouthWest: {
-			switch (data.NeighbourType()) {
+		case WorldDir::SouthWest:
+		{
+			switch (data.NeighbourType())
+			{
 			case PixelType::Space:
 				data.Pass();
 				return;
@@ -44,7 +47,8 @@ class WaterPixel : public BasePixel
 		}
 		// Lets water spread out more easily
 		case WorldDir::South:
-			switch (data.NeighbourType()) {
+			switch (data.NeighbourType())
+			{
 			case PixelType::Space:
 				_rng() % 4 == 0 ? data.Fail() : data.Pass();
 				return;
@@ -56,5 +60,4 @@ class WaterPixel : public BasePixel
 		}
 		data.Fail();
 	}
-
 };

@@ -7,7 +7,7 @@ class DirtPixel final : public BasePixel
  public:
 	DirtPixel() : BasePixel(Pixel::PixelType::Dirt)
 	{
-		SET_PIXEL_NAME("Dirt");
+		SetPixelName("Dirt");
 		is_updateable = false;
 
 		colour_count = 3;

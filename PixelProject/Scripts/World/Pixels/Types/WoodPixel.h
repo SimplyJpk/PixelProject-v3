@@ -10,7 +10,7 @@ class WoodPixel final : public BasePixel
  public:
 	WoodPixel() : BasePixel(Pixel::PixelType::Wood)
 	{
-		SET_PIXEL_NAME("Wood");
+		SetPixelName("Wood");
 		is_updateable = true;
 
 		colour_count = 3;

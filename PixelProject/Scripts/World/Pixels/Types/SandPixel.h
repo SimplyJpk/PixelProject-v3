@@ -8,10 +8,10 @@ using namespace Pixel;
 
 class SandPixel final : public BasePixel
 {
- public:
+public:
 	SandPixel() : BasePixel(Pixel::PixelType::Sand)
 	{
-		SET_PIXEL_NAME("Sand");
+		SetPixelName("Sand");
 		is_updateable = true;
 
 		colour_count = 3;
@@ -21,19 +21,22 @@ class SandPixel final : public BasePixel
 		type_colours[2] = 0xEDC9AFFF;
 
 		_pixel_update_order_count = 2;
-		SET_PIXEL_UPDATE_ORDER(0, WorldDir::South, WorldDir::SouthEast, WorldDir::SouthWest);
-		SET_PIXEL_UPDATE_ORDER(1, WorldDir::South, WorldDir::SouthWest, WorldDir::SouthEast);
+		SetPixelUpdateOrder(0, {WorldDir::South, WorldDir::SouthEast, WorldDir::SouthWest});
+		SetPixelUpdateOrder(1, {WorldDir::South, WorldDir::SouthWest, WorldDir::SouthEast});
 
 		update_function = static_cast<UpdateFunction>(&SandPixel::PixelUpdate);
 	}
 
-	void PixelUpdate(PixelUpdateResult& data, Uint64& pixel_value)
+	void PixelUpdate(PixelUpdateResult &data, Uint64 &pixel_value)
 	{
-		switch (data.Dir()) {
+		switch (data.Dir())
+		{
 		case WorldDir::SouthEast:
 		case WorldDir::South:
-		case WorldDir::SouthWest: {
-			switch (data.NeighbourType()) {
+		case WorldDir::SouthWest:
+		{
+			switch (data.NeighbourType())
+			{
 			case PixelType::Space:
 				data.Pass();
 				return;
@@ -50,5 +53,4 @@ class SandPixel final : public BasePixel
 		}
 		data.Fail();
 	}
-
 };
