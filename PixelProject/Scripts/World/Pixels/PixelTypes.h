@@ -8,3 +8,7 @@
 #include "Types/WaterPixel.h"
 #include "Types/FirePixel.h"
 #include "Types/WoodPixel.h"
+#include "Types/OilPixel.h"
+#include "Types/AcidPixel.h"
+#include "Types/GoldPixel.h"
+#include "Types/SteamPixel.h"

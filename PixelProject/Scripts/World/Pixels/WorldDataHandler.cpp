@@ -22,6 +22,10 @@ WorldDataHandler::WorldDataHandler()
 		WaterPixel(),
 		WoodPixel(),
 		FirePixel(),
+		OilPixel(),
+		AcidPixel(),
+		GoldPixel(),
+		SteamPixel(),
 	};
 
 	for (auto &pixel : _pixel_types)

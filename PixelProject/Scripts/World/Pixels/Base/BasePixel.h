@@ -17,7 +17,7 @@ protected:
 	void NoOpUpdate(PixelUpdateResult &, Uint64 &) noexcept {}
 
 public:
-    using UpdateFunction = void (BasePixel::*)(PixelUpdateResult &, Uint64 &);
+	using UpdateFunction = void (BasePixel::*)(PixelUpdateResult &, Uint64 &);
 
 	// Constructor, taking in the pixel type to help with initialisation
 	BasePixel(Pixel::PixelType _pixel_type = Pixel::PixelType::UNDEF) noexcept;
@@ -60,7 +60,7 @@ protected:
 	std::array<std::array<uint8_t, Chunk::NUM_DIRECTIONS>, Pixel::MAX_UPDATE_ORDER_COUNT> _pixel_update_order;
 
 	constexpr void InsertPixelUpdateOrder(const uint8_t index, const std::vector<Chunk::WorldDir> &directions) noexcept;
-	
-    void SetPixelUpdateOrder(size_t index, std::initializer_list<Chunk::WorldDir> dirs) noexcept;
+
+	void SetPixelUpdateOrder(size_t index, std::initializer_list<Chunk::WorldDir> dirs) noexcept;
 	void SetPixelName(const std::string_view name) noexcept;
 };

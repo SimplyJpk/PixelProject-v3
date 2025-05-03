@@ -5,15 +5,16 @@ layout (location = 1) out vec4 BrightColor;
 in vec2 TexCoord;
 
 uniform usampler2D ourTexture;
-uniform usampler2D noiseTextureIndex;
+// uniform usampler2D noiseTextureIndex;
 
 struct PixelData {
     uint colour_count;
-    vec4 colours[4];
+    vec4 colours[8];
 };
 
 struct MaskData {
     uint index;
+    uint sub_index;
     uint lifetime;
     uint behaviour;
     uint light;
@@ -37,16 +38,15 @@ void main()
     // Use one of the uint components as your value
     uint value = largeValue; // or smallValue depending on your logic
 
-    // Bitwise AND with mask index
-    uint pixelType = u_PixelMask.index & value;
+    // Get Pixel Type
+    uint pixel_type = u_PixelMask.index & value;
+    // Sub-Index (For Colours)
+    uint pixel_subIndex = (u_PixelMask.sub_index & value) >> u_PixelBitOffset.index;
 
-    vec4 colours[4] = u_Pixels[pixelType].colours;
+    vec4 available_colours[8] = u_Pixels[pixel_type].colours;
+    uint colour_index = pixel_subIndex % u_Pixels[pixel_type].colour_count;   
 
-    uint noiseIndex = texture(noiseTextureIndex, TexCoord).r;
-    
-    uint index = noiseIndex % u_Pixels[pixelType].colour_count;
-
-    FragColor = colours[index];
+    FragColor = available_colours[colour_index];
 
     if (FragColor == vec4(0.0)) {
         FragColor = vec4(0.0, 0.0, 0.0, 0.2);

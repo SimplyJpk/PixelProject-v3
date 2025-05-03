@@ -201,6 +201,10 @@ namespace Pixel
 		Water = 3,
 		Wood = 4,
 		Fire = 5,
+		Oil = 6,
+		Acid = 7,
+		Gold = 8,
+		Steam = 9,
 		COUNT,
 	};
 
