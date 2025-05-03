@@ -37,7 +37,7 @@ public:
 	// TODO : (James) Can this be wrapped into something more flexible?
 	uint8_t new_pixel_count = 0;
 	Uint64 new_pixel_value[Pixel::MAX_NEW_VALUE_COUNT] = {0};
-	Uint64 GetNewPixel() noexcept;
+	Uint64 GetNewPixel() noexcept; // TODO: (James) We could optimize this a fair bit if we were willing to convert BasePixel to a template, potentially use of function pointer to derived class might be faster than what we have without templates, but.. maybe not?
 
 	const std::array<uint8_t, 8> &GetPixelUpdateOrder() noexcept;
 	Uint32 GetRandomColour() noexcept;

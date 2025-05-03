@@ -289,9 +289,9 @@ void WorldSimulator::Draw(const Camera *camera)
 	_map_texture->Bind();
 
 	// Find the sampler2D location of noiseTextureIndex
-	constexpr GLuint noiseTextureIndex = 1;
-	const auto noiseTextureLoc = _draw_shader->GetUniformLocation("noiseTextureIndex");
-	glUniform1i(noiseTextureLoc, noiseTextureIndex);
+	// constexpr GLuint noiseTextureIndex = 1;
+	// const auto noiseTextureLoc = _draw_shader->GetUniformLocation("noiseTextureIndex");
+	// glUniform1i(noiseTextureLoc, noiseTextureIndex);
 
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
 

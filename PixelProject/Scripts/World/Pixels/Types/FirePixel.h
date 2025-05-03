@@ -14,11 +14,17 @@ public:
 		SetPixelName("Fire");
 		is_updateable = true;
 
-		colour_count = 3;
+		colour_count = 7;
 		// Yellows
 		type_colours[0] = 0xE25822FF;
 		type_colours[1] = 0x800909FF;
 		type_colours[2] = 0xD73502FF;
+		type_colours[3] = 0xFF9900FF;
+		type_colours[4] = 0xA52A2AFF;
+		type_colours[5] = 0xFF6600FF;
+		type_colours[6] = 0xCD5C5CFF;
+		// when colour_count is 8, colour seems to just use type_colours[0] which is odd
+		type_colours[7] = 0xCC0000FF;
 
 		_pixel_update_order_count = 2;
 		SetPixelUpdateOrder(0, {WorldDir::North,

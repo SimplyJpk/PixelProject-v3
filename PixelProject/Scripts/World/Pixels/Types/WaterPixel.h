@@ -12,11 +12,17 @@ public:
 		SetPixelName("Water");
 		is_updateable = true;
 
-		colour_count = 3;
-		// Blues
+		colour_count = 7;
+		// Darker, Uniform Blues
 		type_colours[0] = 0x0000FFFF;
 		type_colours[1] = 0x2E2EE6FF;
 		type_colours[2] = 0x1818F3FF;
+		type_colours[3] = 0x466A98FF;
+		type_colours[4] = 0x234E6CFF;
+		type_colours[5] = 0x325F8FFF;
+		type_colours[6] = 0x184A77FF;
+
+		type_colours[7] = 0x0F3A6DFF;
 
 		_pixel_update_order_count = 4;
 		SetPixelUpdateOrder(0, {WorldDir::South, WorldDir::SouthEast, WorldDir::SouthWest, WorldDir::East});

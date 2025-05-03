@@ -12,8 +12,7 @@
 #include "World/Pixels/WorldDataHandler.h"
 #include "UI/Paint/PaintSelector.h"
 
-Game::Game(SDL_GLContext* gl_context, SDL_Window* gl_window, std::shared_ptr<GameSettings>& settings) :
-	_input_manager(nullptr), _camera(nullptr)
+Game::Game(SDL_GLContext *gl_context, SDL_Window *gl_window, std::shared_ptr<GameSettings> &settings) : _input_manager(nullptr), _camera(nullptr)
 {
 	_context = gl_context;
 	_window = gl_window;
@@ -39,12 +38,12 @@ bool Game::Initialize()
 
 	// Shaders
 	const auto shaderManager = ShaderManager::GetInstance();
-	Shader* defaultShader = shaderManager->CreateShaderProgramFromFiles(
+	Shader *defaultShader = shaderManager->CreateShaderProgramFromFiles(
 		GetShaderMask(ShaderMask::MVertex, ShaderMask::MFragment), "orthoWorld", "shaders/orthoWorld");
 	shaderManager->SetDefaultShader(defaultShader);
 
 	glUniform1i(defaultShader->GetUniformLocation("ourTexture"), 0);
-	glUniform1i(defaultShader->GetUniformLocation("noiseTextureIndex"), 1);
+	// glUniform1i(defaultShader->GetUniformLocation("noiseTextureIndex"), 1);
 
 	// Input System
 	_input_manager = InputManager::GetInstance();
@@ -72,28 +71,27 @@ void Game::Run()
 	auto deltaClock = clock::now();
 	_is_running = true;
 
-	_input_manager->AddKeyListener(KeyCode::U, "Temp_FixedUpdate", [this](SDL_Event& event, bool state)
-	{
+	_input_manager->AddKeyListener(KeyCode::U, "Temp_FixedUpdate", [this](SDL_Event &event, bool state)
+								   {
 	  if (state) {
 		  _world_simulator->FixedUpdate();
-	  }
-	});
+	  } });
 
 	static bool didSandUpdate = false;
-	_input_manager->AddKeyListener(KeyCode::Zero, "SingleFixedUpdate", [this](SDL_Event& event, bool state)
-	{
+	_input_manager->AddKeyListener(KeyCode::Zero, "SingleFixedUpdate", [this](SDL_Event &event, bool state)
+								   {
 		if (state && !didSandUpdate) {
 			didSandUpdate = true;
 		  _world_simulator->FixedUpdate();
 	  }
 		else if (!state) {
 			didSandUpdate = false;
-		}
-	});
+		} });
 
 	// TODO : (James) While GameStateManager != IsShuttingDown??
 	_minimum_delta_time = 1000.0f / _settings->target_frames_per_second;
-	while (_is_running) {
+	while (_is_running)
+	{
 		_delta_time += duration(clock::now() - deltaClock).count();
 		deltaClock = clock::now();
 
@@ -121,7 +119,8 @@ void Game::Run()
 void Game::FixedUpdate()
 {
 	uint8_t fixedUpdateCount = 0;
-	while (_fixed_time >= _fixed_step_step_time) {
+	while (_fixed_time >= _fixed_step_step_time)
+	{
 		_fixed_time -= _fixed_step_step_time;
 		_sand_time_tracker.Start();
 
@@ -133,11 +132,12 @@ void Game::FixedUpdate()
 
 		_sand_time_tracker.StopWithoutReturn();
 
-		if (fixedUpdateCount >= _fixed_step_max_steps) {
+		if (fixedUpdateCount >= _fixed_step_max_steps)
+		{
 			LOG_WARNING("[Game] FixedUpdate() Falling behind, {} updates this frame ({}ms), remaining {}ms",
-				fixedUpdateCount,
-				std::round(_fixed_step_step_time * fixedUpdateCount * 100) / 100.0f,
-				std::round(_fixed_time * 100) / 100.0f);
+						fixedUpdateCount,
+						std::round(_fixed_step_step_time * fixedUpdateCount * 100) / 100.0f,
+						std::round(_fixed_time * 100) / 100.0f);
 			break;
 		}
 	}
@@ -177,11 +177,11 @@ void Game::OnDrawGUI(float delta_time)
 	const auto maxHistory = _sand_time_tracker.GetMaxHistorySize();
 	// FIXME: What
 	ImGui::Text("Duration in ms of each sand update, over roughly %zu updates or (%.2f seconds)",
-		maxHistory,
-		maxHistory * (1 / _fixed_step_step_time));
+				maxHistory,
+				maxHistory * (1 / _fixed_step_step_time));
 	ImGui::Text("Sand Updates occur in fixed time steps of %.2f ms, roughly %.2f updates per second",
-		_fixed_step_step_time,
-		1000 / _fixed_step_step_time);
+				_fixed_step_step_time,
+				1000 / _fixed_step_step_time);
 
 	// Start the table
 	const float max_time = _sand_time_tracker.GetMaxTime();
@@ -190,7 +190,8 @@ void Game::OnDrawGUI(float delta_time)
 	const float percentile_0_001 = _sand_time_tracker.GetPercentile_0_001();
 	const float percentile_0_010 = _sand_time_tracker.GetPercentile_0_010();
 	const float percentile_0_050 = _sand_time_tracker.GetPercentile_0_050();
-	if (ImGui::BeginTable("Statistics", 2)) {
+	if (ImGui::BeginTable("Statistics", 2))
+	{
 		// Create the headers
 		ImGui::TableSetupColumn("Statistic");
 		ImGui::TableSetupColumn("Value");
@@ -242,16 +243,20 @@ void Game::OnDrawGUI(float delta_time)
 		ImGui::EndTable();
 	}
 
-	if (ImPlot::BeginPlot("Sand Update Duration")) {
+	if (ImPlot::BeginPlot("Sand Update Duration"))
+	{
 		float max_time_graph = 4;
 		float min_time_graph = 0;
-		if (max_time > max_time_graph) {
+		if (max_time > max_time_graph)
+		{
 			max_time_graph = 8;
 			min_time_graph = 2;
-			if (max_time > max_time_graph) {
+			if (max_time > max_time_graph)
+			{
 				max_time_graph = 16;
 				min_time_graph = 4;
-				if (max_time > max_time_graph) {
+				if (max_time > max_time_graph)
+				{
 					max_time_graph = max_time + 1.0f;
 					min_time_graph = max_time / 2.0f;
 				}
@@ -260,9 +265,9 @@ void Game::OnDrawGUI(float delta_time)
 
 		ImPlot::PushStyleColor(ImPlotCol_Line, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
 		ImPlot::SetupAxes("Sand Updates",
-			"Time in Millisecond",
-			ImPlotAxisFlags_Lock,
-			ImPlotAxisFlags_Lock | ImPlotAxisFlags_RangeFit | ImPlotAxisFlags_Opposite);
+						  "Time in Millisecond",
+						  ImPlotAxisFlags_Lock,
+						  ImPlotAxisFlags_Lock | ImPlotAxisFlags_RangeFit | ImPlotAxisFlags_Opposite);
 		ImPlot::SetupAxesLimits(0, maxHistory, min_time_graph, max_time_graph, ImPlotCond_Always);
 		ImPlot::PlotLine<float>("Sand Update Time", _sand_time_tracker.GetHistory().data(), maxHistory);
 

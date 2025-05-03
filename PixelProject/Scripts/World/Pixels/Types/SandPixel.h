@@ -14,11 +14,17 @@ public:
 		SetPixelName("Sand");
 		is_updateable = true;
 
-		colour_count = 3;
+		colour_count = 7;
 		// Yellows
 		type_colours[0] = 0xE2D9AEFF;
 		type_colours[1] = 0xE8BB9AFF;
 		type_colours[2] = 0xEDC9AFFF;
+		type_colours[3] = 0xF4A460FF;
+		type_colours[4] = 0xF0E68CFF;
+		type_colours[5] = 0xFAFAD2FF;
+		type_colours[6] = 0xFFDEADFF;
+		//
+		type_colours[7] = 0xDEB887FF;
 
 		_pixel_update_order_count = 2;
 		SetPixelUpdateOrder(0, {WorldDir::South, WorldDir::SouthEast, WorldDir::SouthWest});

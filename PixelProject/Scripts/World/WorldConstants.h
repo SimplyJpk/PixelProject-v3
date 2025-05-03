@@ -186,7 +186,7 @@ namespace Pixel
 	constexpr char NAME_UNDEFINED[MAX_NAME_LENGTH] = "N/A";
 
 	// Max colours a pixel can reference
-	constexpr int8_t MAX_COLOUR_COUNT = 4;
+	constexpr int8_t MAX_COLOUR_COUNT = 8;
 	// Max pixel direction orders a PixelType can have
 	constexpr int8_t MAX_UPDATE_ORDER_COUNT = 4;
 

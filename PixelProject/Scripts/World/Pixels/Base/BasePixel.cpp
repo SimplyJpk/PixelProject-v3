@@ -1,6 +1,7 @@
 ﻿#include "BasePixel.h"
 #include "Utility/Console.h"
 #include "World/WorldConstants.h"
+#include "World/PixelMask.h"
 
 using namespace Chunk;
 
@@ -83,11 +84,14 @@ void BasePixel::GetIndexAs4FColour(const short index, float *out_colour) const n
 
 Uint64 BasePixel::GetNewPixel() noexcept
 {
-	if (new_pixel_count > 0)
+	Uint64 pixel = pixel_index;
+	if (new_pixel_count > 0) [[likely]]
 	{
-		return new_pixel_value[_rng() % new_pixel_count];
+		pixel = new_pixel_value[_rng() % new_pixel_count];
 	}
-	return static_cast<Uint64>(pixel_index);
+	pixel = PixelMask::SubIndex::SetRandomBits(pixel, _rng);
+
+	return pixel;
 }
 
 void BasePixel::SetPixelUpdateOrder(size_t index, std::initializer_list<Chunk::WorldDir> dirs) noexcept
