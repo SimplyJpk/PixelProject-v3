@@ -90,6 +90,8 @@ void WorldDataHandler::SetUniformData(Shader *shader)
 	// Set MaskData
 	loc = shader->GetUniformLocation("u_PixelMask.index");
 	glProgramUniform1ui(programID, loc, PixelMask::Index::GPU_SHADER_BITS);
+	loc = shader->GetUniformLocation("u_PixelMask.sub_index");
+	glProgramUniform1ui(programID, loc, PixelMask::SubIndex::GPU_SHADER_BITS);
 	loc = shader->GetUniformLocation("u_PixelMask.lifetime");
 	glProgramUniform1ui(programID, loc, PixelMask::Lifetime::GPU_SHADER_BITS);
 	loc = shader->GetUniformLocation("u_PixelMask.behaviour");
@@ -99,11 +101,13 @@ void WorldDataHandler::SetUniformData(Shader *shader)
 
 	// Set MaskData
 	loc = shader->GetUniformLocation("u_PixelBitOffset.index");
-	glProgramUniform1ui(programID, loc, PixelMask::Index::DEPTH);
+	glProgramUniform1ui(programID, loc, PixelMask::Index::GPU_SHADER_BITS_DEPTH);
+	loc = shader->GetUniformLocation("u_PixelBitOffset.sub_index");
+	glProgramUniform1ui(programID, loc, PixelMask::SubIndex::GPU_SHADER_BITS_DEPTH);
 	loc = shader->GetUniformLocation("u_PixelBitOffset.lifetime");
-	glProgramUniform1ui(programID, loc, PixelMask::Lifetime::DEPTH);
+	glProgramUniform1ui(programID, loc, PixelMask::Lifetime::GPU_SHADER_BITS_DEPTH);
 	loc = shader->GetUniformLocation("u_PixelBitOffset.behaviour");
-	glProgramUniform1ui(programID, loc, PixelMask::Behaviour::DEPTH);
+	glProgramUniform1ui(programID, loc, PixelMask::Behaviour::GPU_SHADER_BITS_DEPTH);
 	loc = shader->GetUniformLocation("u_PixelBitOffset.light");
-	glProgramUniform1ui(programID, loc, PixelMask::Light::DEPTH);
+	glProgramUniform1ui(programID, loc, PixelMask::Light::GPU_SHADER_BITS_DEPTH);
 }

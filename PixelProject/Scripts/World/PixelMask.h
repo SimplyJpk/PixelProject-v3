@@ -1,14 +1,13 @@
 ﻿#pragma once
 #include <SDL3/SDL_stdinc.h>
+#include "Utility/XorShift.h"
 
 namespace PixelMask
 {
-
 	// TODO: (James) Do we want to add a "ZeroPoint" to the Masks? We could use this to have 'fake' signed values, but I'm unsure if this helps us (Offset, we can have -2 to +13 instead of -8 to +7) or if it just adds complexity.
 	template <Uint64 BitMask, Uint8 Count, Uint8 Depth, typename ValueType = Uint8>
 	struct Mask
 	{
-
 		static constexpr Uint64 BITS = BitMask;
 
 		static constexpr Uint8 COUNT = Count;
@@ -16,6 +15,7 @@ namespace PixelMask
 
 		// To try increase support by not needing 64bit values in shader, we pass in low/high bits separately due to uint64 limitations
 		static constexpr Uint32 GPU_SHADER_BITS = (BITS > 0xFFFFFFFF) ? ((BITS >> 32) & 0xFFFFFFFF) : (BITS & 0xFFFFFFFF);
+		static constexpr Uint32 GPU_SHADER_BITS_DEPTH = (BITS > 0xFFFFFFFF) ? (DEPTH - 32) : DEPTH;
 		static constexpr ValueType MAX_VALUE = (1ULL << COUNT) - 1;
 
 #pragma region Getter Methods
@@ -161,6 +161,53 @@ namespace PixelMask
 
 #pragma endregion
 
+#pragma region Random Value Methods
+
+		/**
+		 * @brief Gets a random value within the valid range for this mask (0 to MAX_VALUE)
+		 *
+		 * @return constexpr ValueType A random value between 0 and MAX_VALUE inclusive
+		 */
+		static constexpr ValueType GetRandomValidValue(XorShift &_rng) noexcept
+		{
+			return static_cast<ValueType>(_rng() % (MAX_VALUE + 1));
+		}
+
+		/**
+		 * @brief Gets random bits positioned according to this mask's bit pattern
+		 *
+		 * @return constexpr Uint64 Random bits in the mask's position
+		 */
+		static constexpr Uint64 GetRandomValidBits(XorShift &_rng) noexcept
+		{
+			return (static_cast<Uint64>(_rng() % (MAX_VALUE + 1)) << DEPTH) & BITS;
+		}
+
+		/**
+		 * @brief Sets a random value to the mask bits within the given pixel data
+		 *
+		 * @param pixelData The pixel data to modify
+		 * @return constexpr Uint64 The modified pixel data with random bits set
+		 */
+		static constexpr Uint64 SetRandomValue(Uint64 pixelData, XorShift &_rng) noexcept
+		{
+			return SetValue(pixelData, GetRandomValidValue(_rng));
+		}
+
+		/**
+		 * @brief Modifies the pixel data by setting random bits according to this mask's pattern
+		 *
+		 * @param pixelData The pixel data to modify
+		 * @return constexpr Uint64 The modified pixel data
+		 */
+		static constexpr Uint64 SetRandomBits(Uint64 pixelData, XorShift &_rng) noexcept
+		{
+			// Clear the bits for this mask and set random ones
+			return (pixelData & ~BITS) | (GetRandomValidBits(_rng) & BITS);
+		}
+
+#pragma endregion
+
 #pragma region Assertions
 
 		static_assert(std::is_integral_v<ValueType>, "ValueType must be an integral type");
@@ -192,16 +239,18 @@ namespace PixelMask
 	using CloneCount = Mask<0b0000'0000'0000'0000'0000'0011'1000'0000'0000'0000'0000'0000'0000'0000'0000'0000, 3, 39, Uint8>;
 
 	// New Masks somewhere in here, we can't have overlapping masks, use caution when adding new masks. However, the compiler will moan at you if you mess up the bitmask.
-	using WHATS_LEFT = Mask<0b0000'0000'0000'0000'0000'0000'0111'1111'1111'1111'1111'1100'0000'0000'0000'0000, 21, 18, Uint8>;
+	using WHATS_LEFT = Mask<0b0000'0000'0000'0000'0000'0000'0111'1111'1111'1111'1110'0000'0000'0000'0000'0000, 18, 20, Uint8>;
 
 	// Component, normalized velocity of a pixel, ie; number of pixel steps it needs to make per tick. 								(Bits: 3 [U], values 0 to +7)
-	using Velocity = Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0011'1000'0000'0000'0000, 3, 15, Uint8>;
+	using Velocity = Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0001'1100'0000'0000'0000'0000, 3, 17, Uint8>;
 	// Component, used to determine the X velocity of a pixel. (Maybe we want 4 bits?)												(Bits: 3 [U], values 0 to +7)
-	using XVelocity = Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0111'0000'0000'0000, 3, 12, Uint8>;
+	using XVelocity = Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0011'1000'0000'0000'0000, 3, 14, Uint8>;
 	// Component, used to determine the Y velocity of a pixel. (Maybe we want 4 bits?)												(Bits: 3 [U], values 0 to +7)
-	using YVelocity = Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1110'0000'0000, 3, 9, Uint8>;
+	using YVelocity = Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0111'0000'0000'0000, 3, 11, Uint8>;
 	// Component, used to determine the light level of a pixel. 																	(Bits: 4 [U], values 0 to +15)
-	using Light = Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0001'1110'0000, 4, 5, Uint8>;
+	using Light = Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1111'0000'0000, 4, 8, Uint8>;
+	// Component, sub-index for the pixel colours. 																					(Bits: 3 [U], values 0 to +7)
+	using SubIndex = Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1110'0000, 3, 5, Uint8>;
 	// Component, used to determine the index of a pixel.																			(Bits: 5 [U], values 0 to +31)
 	using Index = Mask<0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0001'1111, 5, 0, Uint8>;
 
