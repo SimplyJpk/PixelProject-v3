@@ -33,6 +33,10 @@ namespace PixelMask
 		{
 			return static_cast<ValueType>((pixelData & BITS) >> DEPTH);
 		}
+		static constexpr bool IsValueZero(Uint64 pixelData)
+		{
+			return GetValue(pixelData) == 0;
+		}
 
 #pragma endregion
 

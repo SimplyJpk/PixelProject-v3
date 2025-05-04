@@ -29,36 +29,27 @@ public:
 		_pixel_update_order_count = 2;
 		SetPixelUpdateOrder(0, {WorldDir::North,
 								WorldDir::NorthEast,
-								WorldDir::NorthWest,
-								WorldDir::SouthWest,
-								WorldDir::SouthEast});
+								WorldDir::NorthWest});
 		SetPixelUpdateOrder(1,
 							{WorldDir::North,
 							 WorldDir::NorthWest,
-							 WorldDir::NorthEast,
-							 WorldDir::SouthEast,
-							 WorldDir::SouthWest});
+							 WorldDir::NorthEast});
 
-		update_function = static_cast<UpdateFunction>(&FirePixel::PixelUpdate);
+		update_function = static_cast<UpdateFunction>(&SteamPixel::PixelUpdate);
 
-		constexpr Uint8 FIRE_LIFETIMES[] = {10, 14, 20, 12};
-		new_pixel_value[0] = PixelMask::Lifetime::SetValue(pixel_index, FIRE_LIFETIMES[0]);
-		new_pixel_value[1] = PixelMask::Lifetime::SetValue(pixel_index, FIRE_LIFETIMES[1]);
-		new_pixel_value[2] = PixelMask::Lifetime::SetValue(pixel_index, FIRE_LIFETIMES[2]);
-		new_pixel_value[3] = PixelMask::Lifetime::SetValue(pixel_index, FIRE_LIFETIMES[3]);
+		constexpr Uint8 STEAM_LIFETIMES[] = {40, 46, 61, 57};
+		new_pixel_value[0] = PixelMask::Lifetime::SetValue(pixel_index, STEAM_LIFETIMES[0]);
+		new_pixel_value[1] = PixelMask::Lifetime::SetValue(pixel_index, STEAM_LIFETIMES[1]);
+		new_pixel_value[2] = PixelMask::Lifetime::SetValue(pixel_index, STEAM_LIFETIMES[2]);
+		new_pixel_value[3] = PixelMask::Lifetime::SetValue(pixel_index, STEAM_LIFETIMES[3]);
 
 		new_pixel_count = 4;
 	}
 
 	void PixelUpdate(PixelUpdateResult &data, Uint64 &pixel_value)
 	{
-		pixel_value = PixelMask::Lifetime::DecrementValue(pixel_value);
-
-		Uint8 lifetime = PixelMask::Lifetime::GetValue(pixel_value);
-		// > 80% of the time, probably not going to be 0, so we can assume it is unlikely
-		if (lifetime == 0) [[unlikely]]
+		if (!UpdateLifetime(data, pixel_value, PixelType::Water)) [[unlikely]]
 		{
-			data.SetLocal(PixelType::Space);
 			return;
 		}
 
@@ -67,42 +58,26 @@ public:
 		case WorldDir::North:
 		case WorldDir::NorthWest:
 		case WorldDir::NorthEast:
-		case WorldDir::SouthEast:
-		case WorldDir::South:
-		case WorldDir::SouthWest:
 		{
 			switch (data.NeighbourType())
 			{
 			case PixelType::Space:
-				_rng() % 2 == 0 ? data.Pass() : data.Fail();
-				return;
-
-				// case PixelType::Oil:
-				//    data.SetLocalAndNeighbour(PixelType::Fire, PixelType::Fire);
-				//    return;
-
-			case PixelType::Wood:
-				if (_rng() % 10 == 0)
-				{
-					data.SetLocalAndNeighbour(PixelType::Fire, PixelType::Fire);
-					return;
-				}
-				data.Fail();
-				return;
-
-			case PixelType::Fire:
-				data.SetLocal(PixelType::Fire);
+				_rng() % 10 == 0 ? data.Fail() : data.Pass();
 				return;
 
 			case PixelType::Water:
-				// TODO : (James) Steam
-				data.SetLocalAndNeighbour(PixelType::Space, PixelType::Space);
+				if (_rng() % 10 == 0)
+				{
+					data.SetLocal(PixelType::Water);
+					return;
+				}
+				data.Pass();
 				return;
 			default:
 				break;
 			}
 
-			data.SetLocal(PixelType::Space);
+			// data.SetLocal(PixelType::Water);
 		}
 		default:
 			break;

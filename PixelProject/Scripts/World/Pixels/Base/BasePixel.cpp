@@ -31,20 +31,6 @@ const std::array<uint8_t, 8> &BasePixel::GetPixelUpdateOrder() noexcept
 	return _pixel_update_order[_chunk_order_counter];
 }
 
-constexpr void BasePixel::InsertPixelUpdateOrder(const uint8_t index, const std::vector<Chunk::WorldDir> &directions) noexcept
-{
-	if (index < Pixel::MAX_UPDATE_ORDER_COUNT)
-	{
-		for (uint8_t i = 0; i < Chunk::NUM_DIRECTIONS; i++)
-		{
-			if (i < directions.size())
-				_pixel_update_order[index][i] = static_cast<uint8_t>(directions[i]);
-			else
-				_pixel_update_order[index][i] = Chunk::NUM_DIRECTIONS;
-		}
-	}
-}
-
 void BasePixel::SetPixelName(const std::string_view name) noexcept
 {
 	size_t len = std::min(name.size(), pixel_name.size() - 1);

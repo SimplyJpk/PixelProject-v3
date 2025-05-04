@@ -17,10 +17,10 @@ public:
 		type_colours[0] = 0x0000FFFF;
 		type_colours[1] = 0x2E2EE6FF;
 		type_colours[2] = 0x1818F3FF;
-		type_colours[3] = 0x466A98FF;
+		type_colours[3] = 0x1818F4FF;
 		type_colours[4] = 0x234E6CFF;
 		type_colours[5] = 0x325F8FFF;
-		type_colours[6] = 0x184A77FF;
+		type_colours[6] = 0x1718F4FF;
 
 		type_colours[7] = 0x0F3A6DFF;
 

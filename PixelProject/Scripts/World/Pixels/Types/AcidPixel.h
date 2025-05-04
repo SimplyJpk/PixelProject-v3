@@ -30,7 +30,7 @@ public:
 		SetPixelUpdateOrder(2, {WorldDir::South, WorldDir::SouthWest, WorldDir::SouthEast, WorldDir::West});
 		SetPixelUpdateOrder(3, {WorldDir::South, WorldDir::West, WorldDir::East, WorldDir::SouthWest});
 
-		update_function = static_cast<UpdateFunction>(&OilPixel::PixelUpdate);
+		update_function = static_cast<UpdateFunction>(&AcidPixel::PixelUpdate);
 	}
 
 	void PixelUpdate(PixelUpdateResult &data, Uint64 &pixel_value)

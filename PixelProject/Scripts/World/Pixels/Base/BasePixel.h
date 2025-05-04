@@ -9,6 +9,7 @@
 #include "PixelUpdateResult.h"
 #include "Utility/XorShift.h"
 #include "World/WorldConstants.h"
+#include "World/PixelMask.h"
 
 class BasePixel
 {
@@ -53,13 +54,26 @@ public:
 	}
 
 protected:
+	// Protected methods, snack-sized updates for specific Masks called from derived UpdatePixel methods
+	// Update Lifetime (Decay)
+	constexpr bool UpdateLifetime(PixelUpdateResult &data, Uint64 &pixel_value, Pixel::PixelType decay_into) noexcept
+	{
+		pixel_value = PixelMask::Lifetime::DecrementValue(pixel_value);
+
+		if (PixelMask::Lifetime::IsValueZero(pixel_value)) [[unlikely]]
+		{
+			data.SetLocal(decay_into);
+			return false;
+		}
+		return true;
+	}
+
+protected:
 	XorShift _rng;
 
 	uint8_t _chunk_order_counter = 0;
 	uint8_t _pixel_update_order_count = 0;
 	std::array<std::array<uint8_t, Chunk::NUM_DIRECTIONS>, Pixel::MAX_UPDATE_ORDER_COUNT> _pixel_update_order;
-
-	constexpr void InsertPixelUpdateOrder(const uint8_t index, const std::vector<Chunk::WorldDir> &directions) noexcept;
 
 	void SetPixelUpdateOrder(size_t index, std::initializer_list<Chunk::WorldDir> dirs) noexcept;
 	void SetPixelName(const std::string_view name) noexcept;

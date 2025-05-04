@@ -52,13 +52,8 @@ public:
 
 	void PixelUpdate(PixelUpdateResult &data, Uint64 &pixel_value)
 	{
-		pixel_value = PixelMask::Lifetime::DecrementValue(pixel_value);
-
-		Uint8 lifetime = PixelMask::Lifetime::GetValue(pixel_value);
-		// > 80% of the time, probably not going to be 0, so we can assume it is unlikely
-		if (lifetime == 0) [[unlikely]]
+		if (!UpdateLifetime(data, pixel_value, PixelType::Space)) [[unlikely]]
 		{
-			data.SetLocal(PixelType::Space);
 			return;
 		}
 
@@ -77,9 +72,9 @@ public:
 				_rng() % 2 == 0 ? data.Pass() : data.Fail();
 				return;
 
-				// case PixelType::Oil:
-				//    data.SetLocalAndNeighbour(PixelType::Fire, PixelType::Fire);
-				//    return;
+			case PixelType::Oil:
+				data.SetLocalAndNeighbour(PixelType::Fire, PixelType::Fire);
+				return;
 
 			case PixelType::Wood:
 				if (_rng() % 10 == 0)
@@ -95,8 +90,7 @@ public:
 				return;
 
 			case PixelType::Water:
-				// TODO : (James) Steam
-				data.SetLocalAndNeighbour(PixelType::Space, PixelType::Space);
+				data.SetLocalAndNeighbour(PixelType::Space, PixelType::Steam);
 				return;
 			default:
 				break;
