@@ -31,10 +31,19 @@ public:
 		SetPixelUpdateOrder(1, {WorldDir::South, WorldDir::SouthWest, WorldDir::SouthEast});
 
 		update_function = static_cast<UpdateFunction>(&SandPixel::PixelUpdate);
+
+		new_pixel_value[0] = PixelMask::Density::SetValue(pixel_index, 6);
+		new_pixel_count = 1;
 	}
 
-	void PixelUpdate(PixelUpdateResult &data, Uint64 &pixel_value)
+	void PixelUpdate(PixelUpdateResult &data, Uint64 &pixel_value, const Uint64 &neighbour_value) noexcept
 	{
+		if (UpdateDensity(data, pixel_value, neighbour_value, _rng)) [[unlikely]]
+		{
+			data.Pass();
+			return;
+		}
+
 		switch (data.Dir())
 		{
 		case WorldDir::SouthEast:
@@ -46,9 +55,9 @@ public:
 			case PixelType::Space:
 				data.Pass();
 				return;
-			case PixelType::Water:
-				(_rng() % 3 == 0 ? data.Pass() : data.Fail());
-				return;
+			// case PixelType::Water:
+			// 	(_rng() % 3 == 0 ? data.Pass() : data.Fail());
+			// 	return;
 			default:
 				break;
 			}

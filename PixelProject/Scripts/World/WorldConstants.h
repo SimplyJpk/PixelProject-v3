@@ -51,30 +51,41 @@ namespace Chunk
 	};
 
 	constexpr IVec2 WORLD_DIR_DIRECTION_VECTORS[] = {
-		IVec2{ 0, -1 },    // North
-		IVec2{ 1, -1 },    // NorthEast
-		IVec2{ 1, 0 },     // East
-		IVec2{ 1, 1 },     // SouthEast
-		IVec2{ 0, 1 },     // South
-		IVec2{ -1, 1 },    // SouthWest
-		IVec2{ -1, 0 },    // West
-		IVec2{ -1, -1 },   // NorthWest
-		IVec2{ 0, 0 }      // Undefined
+		IVec2{0, -1},  // North
+		IVec2{1, -1},  // NorthEast
+		IVec2{1, 0},   // East
+		IVec2{1, 1},   // SouthEast
+		IVec2{0, 1},   // South
+		IVec2{-1, 1},  // SouthWest
+		IVec2{-1, 0},  // West
+		IVec2{-1, -1}, // NorthWest
+		IVec2{0, 0}	   // Undefined
 	};
 
-	constexpr const char* WORLD_DIR_NAMES[] = {
-		"North",      // North
-		"NorthEast",  // NorthEast
-		"East",       // East
-		"SouthEast",  // SouthEast
-		"South",      // South
-		"SouthWest",  // SouthWest
-		"West",       // West
-		"NorthWest",  // NorthWest
-		"Undefined"   // Undefined
+	constexpr int8_t WORLD_DIR_Y_DIRECTIONS[] = {
+		/* WorldDir::North     */ -1,
+		/* WorldDir::NorthEast */ -1,
+		/* WorldDir::East      */ 0,
+		/* WorldDir::SouthEast */ 1,
+		/* WorldDir::South     */ 1,
+		/* WorldDir::SouthWest */ 1,
+		/* WorldDir::West      */ 0,
+		/* WorldDir::NorthWest */ -1,
+		/* WorldDir::Undefined */ 0};
+
+	constexpr const char *WORLD_DIR_NAMES[] = {
+		"North",	 // North
+		"NorthEast", // NorthEast
+		"East",		 // East
+		"SouthEast", // SouthEast
+		"South",	 // South
+		"SouthWest", // SouthWest
+		"West",		 // West
+		"NorthWest", // NorthWest
+		"Undefined"	 // Undefined
 	};
 
-	constexpr const char* GetWorldDirName(const WorldDir world_dir)
+	constexpr const char *GetWorldDirName(const WorldDir world_dir)
 	{
 		return WORLD_DIR_NAMES[static_cast<uint8_t>(world_dir)];
 	}
@@ -82,6 +93,11 @@ namespace Chunk
 	constexpr IVec2 GetDirVector(const WorldDir world_dir)
 	{
 		return WORLD_DIR_DIRECTION_VECTORS[static_cast<uint8_t>(world_dir)];
+	}
+
+	constexpr int8_t GetYDirFromWorldDir(const WorldDir world_dir)
+	{
+		return WORLD_DIR_Y_DIRECTIONS[static_cast<uint8_t>(world_dir)];
 	}
 
 	constexpr uint8_t GetDirectionIndex(const WorldDir direction)
@@ -106,15 +122,15 @@ namespace Chunk
 		ChunkPixelBorderMask::South | ChunkPixelBorderMask::SouthEast | ChunkPixelBorderMask::SouthWest;
 
 	constexpr ChunkPixelBorderMask WORLD_DIR_TO_BORDER_MASK[] = {
-		ChunkPixelBorderMask::North,      // North
-		ChunkPixelBorderMask::NorthEast,  // NorthEast
-		ChunkPixelBorderMask::East,       // East
-		ChunkPixelBorderMask::SouthEast,  // SouthEast
-		ChunkPixelBorderMask::South,      // South
-		ChunkPixelBorderMask::SouthWest,  // SouthWest
-		ChunkPixelBorderMask::West,       // West
-		ChunkPixelBorderMask::NorthWest,  // NorthWest
-		ChunkPixelBorderMask::Undefined   // Undefined
+		ChunkPixelBorderMask::North,	 // North
+		ChunkPixelBorderMask::NorthEast, // NorthEast
+		ChunkPixelBorderMask::East,		 // East
+		ChunkPixelBorderMask::SouthEast, // SouthEast
+		ChunkPixelBorderMask::South,	 // South
+		ChunkPixelBorderMask::SouthWest, // SouthWest
+		ChunkPixelBorderMask::West,		 // West
+		ChunkPixelBorderMask::NorthWest, // NorthWest
+		ChunkPixelBorderMask::Undefined	 // Undefined
 	};
 
 	constexpr ChunkPixelBorderMask WorldDirToChunkBorderMask(const WorldDir world_dir)
@@ -130,22 +146,21 @@ namespace Chunk
 
 	constexpr WorldDir BORDER_MASK_TO_WORLD_DIR[] = {
 		WorldDir::Undefined,
-		WorldDir::North,        // North
-		WorldDir::East,         // East
-		WorldDir::NorthEast,    // NorthEast
-		WorldDir::South,        // South
+		WorldDir::North,	 // North
+		WorldDir::East,		 // East
+		WorldDir::NorthEast, // NorthEast
+		WorldDir::South,	 // South
 		WorldDir::Undefined,
-		WorldDir::SouthEast,    // SouthEast
+		WorldDir::SouthEast, // SouthEast
 		WorldDir::Undefined,
-		WorldDir::West,         // West
-		WorldDir::NorthWest,    // NorthWest
-		WorldDir::Undefined,
-		WorldDir::Undefined,
-		WorldDir::SouthWest,    // SouthWest
+		WorldDir::West,		 // West
+		WorldDir::NorthWest, // NorthWest
 		WorldDir::Undefined,
 		WorldDir::Undefined,
-		WorldDir::Undefined
-	};
+		WorldDir::SouthWest, // SouthWest
+		WorldDir::Undefined,
+		WorldDir::Undefined,
+		WorldDir::Undefined};
 
 	constexpr WorldDir ChunkBorderMaskToWorldDir(const ChunkPixelBorderMask chunk_border_mask)
 	{
@@ -172,9 +187,9 @@ namespace Chunk
 	static_assert(ARRAY_MAX_INDEX == TOTAL_SIZE - 1, "ARRAY_MAX_INDEX must be TOTAL_SIZE - 1");
 
 	static_assert(WorldDirToChunkBorderMask(WorldDir::North) == ChunkPixelBorderMask::North,
-		"WorldDirToChunkBorderMask(WorldDir::North) must be ChunkPixelBorderMask::North");
+				  "WorldDirToChunkBorderMask(WorldDir::North) must be ChunkPixelBorderMask::North");
 	static_assert(WorldDirToChunkBorderMask(WorldDir::South) == ChunkPixelBorderMask::South,
-		"WorldDirToChunkBorderMask(WorldDir::South) must be ChunkPixelBorderMask::South");
+				  "WorldDirToChunkBorderMask(WorldDir::South) must be ChunkPixelBorderMask::South");
 
 #pragma endregion Static Assertions
 
@@ -212,15 +227,14 @@ namespace Pixel
 	constexpr int8_t TYPE_COUNT = static_cast<int8_t>(PixelType::COUNT);
 
 	constexpr int16_t INDEX_DIRECTION_CHANGE[] = {
-		/* N  */    -Chunk::SIZE_X,
-		/* NE */    -Chunk::SIZE_X + 1,
-		/* E  */    1,
-		/* SE */    Chunk::SIZE_X + 1,
-		/* S  */    Chunk::SIZE_X,
-		/* SW */    Chunk::SIZE_X - 1,
-		/* W  */    -1,
-		/* NW */    -Chunk::SIZE_X - 1
-	};
+		/* N  */ -Chunk::SIZE_X,
+		/* NE */ -Chunk::SIZE_X + 1,
+		/* E  */ 1,
+		/* SE */ Chunk::SIZE_X + 1,
+		/* S  */ Chunk::SIZE_X,
+		/* SW */ Chunk::SIZE_X - 1,
+		/* W  */ -1,
+		/* NW */ -Chunk::SIZE_X - 1};
 
 	// Logic used to update Pixels.
 	enum LogicResult : int8_t
@@ -235,22 +249,21 @@ namespace Pixel
 	};
 
 	constexpr int16_t INDEX_ADJUSTMENTS[] = {
-		Chunk::TOTAL_SIZE - Chunk::SIZE_X,     // North
-		Chunk::TOTAL_SIZE - Chunk::SIZE_X - 1, // NorthEast
-		-Chunk::SIZE_X + 1,                    // East
-		-Chunk::TOTAL_SIZE + Chunk::SIZE_X + 1,// SouthEast
-		-Chunk::TOTAL_SIZE + Chunk::SIZE_X,    // South
-		-Chunk::TOTAL_SIZE + Chunk::SIZE_X - 1,// SouthWest
-		Chunk::SIZE_X - 1,                     // West
-		Chunk::TOTAL_SIZE - Chunk::SIZE_X + 1  // NorthWest
+		Chunk::TOTAL_SIZE - Chunk::SIZE_X,		// North
+		Chunk::TOTAL_SIZE - Chunk::SIZE_X - 1,	// NorthEast
+		-Chunk::SIZE_X + 1,						// East
+		-Chunk::TOTAL_SIZE + Chunk::SIZE_X + 1, // SouthEast
+		-Chunk::TOTAL_SIZE + Chunk::SIZE_X,		// South
+		-Chunk::TOTAL_SIZE + Chunk::SIZE_X - 1, // SouthWest
+		Chunk::SIZE_X - 1,						// West
+		Chunk::TOTAL_SIZE - Chunk::SIZE_X + 1	// NorthWest
 	};
 
 	constexpr bool WillTraverseToNewChunk(
 		uint16_t currentIndex,
 		uint8_t direction,
-		uint16_t& outNewIndex,
-		uint8_t pixelBorderMask
-	)
+		uint16_t &outNewIndex,
+		uint8_t pixelBorderMask)
 	{
 		outNewIndex = currentIndex + INDEX_DIRECTION_CHANGE[direction];
 		const auto isTraversingChunk = (pixelBorderMask & Chunk::WORLD_DIR_TO_BORDER_MASK[direction]) != 0;

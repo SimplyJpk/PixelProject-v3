@@ -31,9 +31,11 @@ public:
 		SetPixelUpdateOrder(3, {WorldDir::South, WorldDir::West, WorldDir::East, WorldDir::SouthWest});
 
 		update_function = static_cast<UpdateFunction>(&AcidPixel::PixelUpdate);
+
+		// TODO: (James) Should add a bit for Acid Immunity
 	}
 
-	void PixelUpdate(PixelUpdateResult &data, Uint64 &pixel_value)
+	void PixelUpdate(PixelUpdateResult &data, Uint64 &pixel_value, const Uint64 &neighbour_value) noexcept
 	{
 		switch (data.Dir())
 		{
@@ -51,7 +53,7 @@ public:
 				break;
 			}
 		}
-		// Lets water spread out more easily
+		// Lets Acid spread out more easily
 		case WorldDir::South:
 			switch (data.NeighbourType())
 			{

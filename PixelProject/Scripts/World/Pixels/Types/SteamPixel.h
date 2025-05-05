@@ -46,7 +46,7 @@ public:
 		new_pixel_count = 4;
 	}
 
-	void PixelUpdate(PixelUpdateResult &data, Uint64 &pixel_value)
+	void PixelUpdate(PixelUpdateResult &data, Uint64 &pixel_value, const Uint64 &neighbour_value) noexcept
 	{
 		if (!UpdateLifetime(data, pixel_value, PixelType::Water)) [[unlikely]]
 		{

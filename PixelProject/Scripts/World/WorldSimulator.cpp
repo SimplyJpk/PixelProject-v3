@@ -229,7 +229,7 @@ void WorldSimulator::UpdateChunk(const IVec2 &chunk_index)
 				  pixelUpdateResult.SetNeighbour(neighbourPixel->pixel_type);
 				  pixelUpdateResult.SetDirection(static_cast<Chunk::WorldDir>(updateDir));
 
-				  pixel->UpdatePixel(pixelUpdateResult, localPixelValue);
+				  pixel->UpdatePixel(pixelUpdateResult, localPixelValue, neighbourPixelValue);
 
 				  switch (pixelUpdateResult.Result()) {
 				  case LogicResult::SuccessUpdate:

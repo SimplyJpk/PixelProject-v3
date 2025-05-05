@@ -15,10 +15,10 @@ class BasePixel
 {
 protected:
 	// No-Op function
-	void NoOpUpdate(PixelUpdateResult &, Uint64 &) noexcept {}
+	void NoOpUpdate(PixelUpdateResult &, Uint64 &, const Uint64 &) noexcept {}
 
 public:
-	using UpdateFunction = void (BasePixel::*)(PixelUpdateResult &, Uint64 &);
+	using UpdateFunction = void (BasePixel::*)(PixelUpdateResult &, Uint64 &, const Uint64 &) noexcept;
 
 	// Constructor, taking in the pixel type to help with initialisation
 	BasePixel(Pixel::PixelType _pixel_type = Pixel::PixelType::UNDEF) noexcept;
@@ -48,15 +48,15 @@ public:
 
 	// Pixel Updating
 	UpdateFunction update_function = &BasePixel::NoOpUpdate;
-	void UpdatePixel(PixelUpdateResult &result, Uint64 &pixel_value) noexcept
+	void UpdatePixel(PixelUpdateResult &result, Uint64 &pixel_value, const Uint64 &neighbour_value) noexcept
 	{
-		(this->*update_function)(result, pixel_value);
+		(this->*update_function)(result, pixel_value, neighbour_value);
 	}
 
 protected:
 	// Protected methods, snack-sized updates for specific Masks called from derived UpdatePixel methods
 	// Update Lifetime (Decay)
-	constexpr bool UpdateLifetime(PixelUpdateResult &data, Uint64 &pixel_value, Pixel::PixelType decay_into) noexcept
+	constexpr bool UpdateLifetime(PixelUpdateResult &data, Uint64 &pixel_value, const Pixel::PixelType decay_into) noexcept
 	{
 		pixel_value = PixelMask::Lifetime::DecrementValue(pixel_value);
 
@@ -66,6 +66,54 @@ protected:
 			return false;
 		}
 		return true;
+	}
+
+	constexpr bool UpdateDensity(PixelUpdateResult &data, Uint64 &pixel_value, const Uint64 &neighbour_value, XorShift &_rng) noexcept
+	{
+		const auto density = PixelMask::Density::GetValue(pixel_value);
+		if (density == 0)
+		{
+			return false;
+		}
+		const auto neighbour_density = PixelMask::Density::GetValue(neighbour_value);
+		if (neighbour_density == 0)
+		{
+			return false;
+		}
+
+		const int8_t densityDifference = density - neighbour_density;
+		// If densities are the same, we skip
+		if (densityDifference == 0)
+		{
+			return false;
+		}
+
+		// Get the vertical direction the pixel is trying to move.
+		const int8_t pixelDirection = Chunk::GetYDirFromWorldDir(data.Dir());
+
+		// Determine the expected vertical direction based on the density difference.
+		int8_t expectedDirection = 1;
+		if (densityDifference < 0)
+		{
+			// Less dense, so trend upwards
+			expectedDirection = -1;
+		}
+
+		if (pixelDirection == expectedDirection)
+		{
+			// An attempt at branchless rolling
+			const auto diff = std::abs(densityDifference);
+
+			const int fullChance = (diff > 5);
+			const int chancePercent = 18 * diff;
+			const int roll = _rng() % 100;
+
+			const int partialChance = (roll < chancePercent);
+
+			// Basically, if the pixel is denser than the neighbor, it has a chance to move, 18% per density diff
+			return (fullChance | partialChance) != 0;
+		}
+		return false;
 	}
 
 protected:
