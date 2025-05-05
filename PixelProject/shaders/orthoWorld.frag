@@ -5,7 +5,6 @@ layout (location = 1) out vec4 BrightColor;
 in vec2 TexCoord;
 
 uniform usampler2D ourTexture;
-// uniform usampler2D noiseTextureIndex;
 
 struct PixelData {
     uint colour_count;

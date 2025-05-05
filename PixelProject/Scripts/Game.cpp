@@ -43,7 +43,6 @@ bool Game::Initialize()
 	shaderManager->SetDefaultShader(defaultShader);
 
 	glUniform1i(defaultShader->GetUniformLocation("ourTexture"), 0);
-	// glUniform1i(defaultShader->GetUniformLocation("noiseTextureIndex"), 1);
 
 	// Input System
 	_input_manager = InputManager::GetInstance();
